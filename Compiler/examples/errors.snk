@@ -1,0 +1,6 @@
+Snk_Begin
+Snk_Int i #
+Set i 10
+Set k 5 #
+Set i 2.5 #
+Snk_End
