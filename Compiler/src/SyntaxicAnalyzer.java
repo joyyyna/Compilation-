@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class SyntaxicAnalyzer {
 
     private static final String IDENT = "[a-zA-Z][a-zA-Z0-9_]*";
