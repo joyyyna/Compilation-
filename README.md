@@ -4,9 +4,11 @@ A small compiler front-end written in **Java** for **SNAKE**, a simple teaching 
 
 | Stage | Class | What it does |
 |-------|-------|--------------|
-| **Lexical analysis** | `Lexer` | Splits the program into tokens (keywords, identifiers, numbers, strings, symbols, operators, comments) and explains each one. Unknown characters are reported as `inconnu` instead of being skipped |
+| **Lexical analysis** | `Lexer` | Splits the program into tokens (keywords, identifiers, numbers, strings, symbols, operators, comments) and explains each one. Unknown characters are reported as `unknown` instead of being skipped |
 | **Syntax analysis** | `SyntaxicAnalyzer` | Checks each line against the language rules: instructions end with `#`, program starts with `Snk_Begin` and ends with `Snk_End`, `Begin`/`End` blocks are balanced, `Else` follows an `If`, conditions and `Snk_Print` arguments are well formed, variables are declared before use |
 | **Semantic analysis** | `SemanticAnalyzer` | Tracks declared variables and their types, and reports undeclared variables, redeclarations, reserved words used as names, and type mismatches (assignments and conditions) |
+
+University project (compilation course, USTO-MB, M1 AI & Applications).
 
 ## The SNAKE language
 
@@ -81,24 +83,24 @@ Snk_End
 Syntax analysis:
 
 ```
-Résultat de l'analyse syntaxique :
-Commentaire détecté : ## A valid SNAKE program
-Début du programme détecté.
-Déclaration détectée : i
-Déclaration détectée : j
-Déclaration détectée : x1
-Déclaration détectée : s
-Affectation détectée : Set i 10 #
-Affectation détectée : Set s "Hello, World" #
-Condition If détectée : If [ i < 20 ]
-Affectation détectée : Set j 5 #
-Bloc Else détecté.
-Début de bloc détecté.
-Affectation détectée : Set x1 15.5 #
-Fin de bloc détectée.
-Instruction d'affichage détectée : Snk_Print s, "!" #
-Fin du programme détectée.
-Aucune erreur syntaxique.
+Syntax Analysis Result:
+Comment detected: ## A valid SNAKE program
+Program start detected.
+Declaration detected: i
+Declaration detected: j
+Declaration detected: x1
+Declaration detected: s
+Assignment detected: Set i 10 #
+Assignment detected: Set s "Hello, World" #
+If condition detected: If [ i < 20 ]
+Assignment detected: Set j 5 #
+Else block detected.
+Block start detected.
+Assignment detected: Set x1 15.5 #
+Block end detected.
+Print instruction detected: Snk_Print s, "!" #
+Program end detected.
+No syntax errors.
 ```
 
 Semantic analysis:
@@ -133,14 +135,14 @@ Snk_End
 Syntax analysis (a type mismatch is not a syntax error, so `Set i 2.5 #` passes here):
 
 ```
-Résultat de l'analyse syntaxique :
-Début du programme détecté.
-Déclaration détectée : i
-Erreur (ligne 3) : '#' manquant à la fin de l'affectation : Set i 10
-Erreur (ligne 4) : la variable 'k' n'est pas déclarée.
-Affectation détectée : Set i 2.5 #
-Fin du programme détectée.
-2 erreur(s) syntaxique(s).
+Syntax Analysis Result:
+Program start detected.
+Declaration detected: i
+Error (line 3): missing '#' at the end of the assignment: Set i 10
+Error (line 4): variable 'k' is not declared.
+Assignment detected: Set i 2.5 #
+Program end detected.
+2 syntax error(s).
 ```
 
 Semantic analysis:
@@ -156,4 +158,4 @@ Error: Type mismatch in assignment. Expected int but got '2.5'. Line: Set i 2.5 
 
 ## Limitations
 
-This is a learning project. The analyzers work **line by line** and do not build a syntax tree, and the compiler does not generate code. `If` / `Else` / `Begin` / `End` pairing is only counted, not matched structurally. Syntax messages are in French and semantic messages in English.
+This is a learning project. The analyzers work **line by line** and do not build a syntax tree, and the compiler does not generate code. `If` / `Else` / `Begin` / `End` pairing is only counted, not matched structurally.
