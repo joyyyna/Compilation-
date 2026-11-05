@@ -26,7 +26,7 @@ public class SnakeFileHandler {
 		} catch (CharacterCodingException e) {
 			text = new String(bytes, Charset.forName("windows-1252"));
 		}
-		if (text.startsWith("﻿")) {
+		if (text.startsWith("\uFEFF")) {
 			text = text.substring(1);
 		}
 		return text;

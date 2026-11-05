@@ -29,7 +29,7 @@ public class SyntaxicAnalyzer {
         declaredVariables.clear();
         errors = 0;
 
-        StringBuilder result = new StringBuilder("Résultat de l'analyse syntaxique :\n");
+        StringBuilder result = new StringBuilder("Syntax Analysis Result:\n");
         String[] lines = code.split("\\R", -1);
 
         boolean begun = false;
@@ -43,31 +43,31 @@ public class SyntaxicAnalyzer {
             int n = i + 1;
             String line = lines[i].trim();
 
-            // Lignes vides : ignorées
+            // Blank lines: ignored
             if (line.isEmpty()) {
                 continue;
             }
 
-            // Commentaires
+            // Comments
             if (line.startsWith("##")) {
-                result.append("Commentaire détecté : ").append(line).append("\n");
+                result.append("Comment detected: ").append(line).append("\n");
                 continue;
             }
 
-            // Premier mot de la ligne (comparé en entier, pas avec startsWith)
+            // First word of the line (compared as a whole word, not with startsWith)
             Matcher km = KEYWORD_P.matcher(line);
             String keyword = km.find() ? km.group() : "";
             String rest = line.substring(keyword.length()).trim();
 
             if (ended) {
-                error(result, n, "instruction après 'Snk_End' : " + line);
+                error(result, n, "instruction after 'Snk_End': " + line);
                 continue;
             }
 
             if (!firstStatementSeen) {
                 firstStatementSeen = true;
                 if (!keyword.equals("Snk_Begin")) {
-                    error(result, n, "le programme doit commencer par 'Snk_Begin'.");
+                    error(result, n, "the program must start with 'Snk_Begin'.");
                     beginProblemReported = true;
                 }
             }
@@ -75,52 +75,52 @@ public class SyntaxicAnalyzer {
             switch (keyword) {
             case "Snk_Begin":
                 if (!rest.isEmpty()) {
-                    error(result, n, "'Snk_Begin' doit être seul sur sa ligne : " + line);
+                    error(result, n, "'Snk_Begin' must be alone on its line: " + line);
                 } else if (begun) {
-                    error(result, n, "'Snk_Begin' déjà présent.");
+                    error(result, n, "'Snk_Begin' is already present.");
                 } else {
-                    result.append("Début du programme détecté.\n");
+                    result.append("Program start detected.\n");
                 }
                 begun = true;
                 break;
 
             case "Snk_End":
                 if (!rest.isEmpty()) {
-                    error(result, n, "'Snk_End' doit être seul sur sa ligne : " + line);
+                    error(result, n, "'Snk_End' must be alone on its line: " + line);
                 } else {
-                    result.append("Fin du programme détectée.\n");
+                    result.append("Program end detected.\n");
                 }
                 ended = true;
                 break;
 
             case "Begin":
                 if (!rest.isEmpty()) {
-                    error(result, n, "'Begin' doit être seul sur sa ligne : " + line);
+                    error(result, n, "'Begin' must be alone on its line: " + line);
                 } else {
                     blockDepth++;
-                    result.append("Début de bloc détecté.\n");
+                    result.append("Block start detected.\n");
                 }
                 break;
 
             case "End":
                 if (!rest.isEmpty()) {
-                    error(result, n, "'End' doit être seul sur sa ligne : " + line);
+                    error(result, n, "'End' must be alone on its line: " + line);
                 } else if (blockDepth == 0) {
-                    error(result, n, "'End' sans 'Begin' correspondant.");
+                    error(result, n, "'End' without a matching 'Begin'.");
                 } else {
                     blockDepth--;
-                    result.append("Fin de bloc détectée.\n");
+                    result.append("Block end detected.\n");
                 }
                 break;
 
             case "Else":
                 if (!rest.isEmpty()) {
-                    error(result, n, "'Else' doit être seul sur sa ligne : " + line);
+                    error(result, n, "'Else' must be alone on its line: " + line);
                 } else if (pendingIfs == 0) {
-                    error(result, n, "'Else' sans 'If' correspondant.");
+                    error(result, n, "'Else' without a matching 'If'.");
                 } else {
                     pendingIfs--;
-                    result.append("Bloc Else détecté.\n");
+                    result.append("Else block detected.\n");
                 }
                 break;
 
@@ -128,11 +128,11 @@ public class SyntaxicAnalyzer {
                 pendingIfs++;
                 Matcher m = COND_P.matcher(rest);
                 if (!m.matches()) {
-                    error(result, n, "condition incorrecte (attendu : If [ a < b ]) : " + line);
+                    error(result, n, "invalid condition (expected: If [ a < b ]): " + line);
                 } else {
                     boolean ok = checkDeclared(result, n, m.group(1)) & checkDeclared(result, n, m.group(3));
                     if (ok) {
-                        result.append("Condition If détectée : ").append(line).append("\n");
+                        result.append("If condition detected: ").append(line).append("\n");
                     }
                 }
                 break;
@@ -142,7 +142,7 @@ public class SyntaxicAnalyzer {
             case "Snk_Real":
             case "Snk_Strg":
                 if (!line.endsWith("#")) {
-                    error(result, n, "'#' manquant à la fin de la déclaration : " + line);
+                    error(result, n, "missing '#' at the end of the declaration: " + line);
                 } else {
                     declaration(result, n, line.substring(keyword.length(), line.length() - 1).trim(), line);
                 }
@@ -150,16 +150,16 @@ public class SyntaxicAnalyzer {
 
             case "Set":
                 if (!line.endsWith("#")) {
-                    error(result, n, "'#' manquant à la fin de l'affectation : " + line);
+                    error(result, n, "missing '#' at the end of the assignment: " + line);
                 } else {
                     String body = line.substring(keyword.length(), line.length() - 1).trim();
                     Matcher m = ASSIGN_P.matcher(body);
                     if (!m.matches()) {
-                        error(result, n, "affectation incorrecte (attendu : Set x valeur #) : " + line);
+                        error(result, n, "invalid assignment (expected: Set x value #): " + line);
                     } else {
                         boolean ok = checkDeclared(result, n, m.group(1)) & checkDeclared(result, n, m.group(2));
                         if (ok) {
-                            result.append("Affectation détectée : ").append(line).append("\n");
+                            result.append("Assignment detected: ").append(line).append("\n");
                         }
                     }
                 }
@@ -167,16 +167,16 @@ public class SyntaxicAnalyzer {
 
             case "Get":
                 if (!line.endsWith("#")) {
-                    error(result, n, "'#' manquant à la fin de l'instruction Get : " + line);
+                    error(result, n, "missing '#' at the end of the Get instruction: " + line);
                 } else {
                     String body = line.substring(keyword.length(), line.length() - 1).trim();
                     Matcher m = GET_P.matcher(body);
                     if (!m.matches()) {
-                        error(result, n, "instruction Get incorrecte (attendu : Get x from y #) : " + line);
+                        error(result, n, "invalid Get instruction (expected: Get x from y #): " + line);
                     } else {
                         boolean ok = checkDeclared(result, n, m.group(1)) & checkDeclared(result, n, m.group(2));
                         if (ok) {
-                            result.append("Instruction Get détectée : ").append(line).append("\n");
+                            result.append("Get instruction detected: ").append(line).append("\n");
                         }
                     }
                 }
@@ -184,11 +184,11 @@ public class SyntaxicAnalyzer {
 
             case "Snk_Print":
                 if (!line.endsWith("#")) {
-                    error(result, n, "'#' manquant à la fin de l'instruction d'affichage : " + line);
+                    error(result, n, "missing '#' at the end of the print instruction: " + line);
                 } else {
                     String body = line.substring(keyword.length(), line.length() - 1).trim();
                     if (!PRINT_P.matcher(body).matches()) {
-                        error(result, n, "affichage incorrect (attendu : chaînes ou variables séparées par des virgules) : " + line);
+                        error(result, n, "invalid print (expected strings or variables separated by commas): " + line);
                     } else {
                         boolean ok = true;
                         Matcher items = ITEM_P.matcher(body);
@@ -196,46 +196,46 @@ public class SyntaxicAnalyzer {
                             ok &= checkDeclared(result, n, items.group());
                         }
                         if (ok) {
-                            result.append("Instruction d'affichage détectée : ").append(line).append("\n");
+                            result.append("Print instruction detected: ").append(line).append("\n");
                         }
                     }
                 }
                 break;
 
             default:
-                error(result, n, "ligne inconnue ou syntaxe incorrecte : " + line);
+                error(result, n, "unknown instruction or invalid syntax: " + line);
             }
         }
 
-        // Vérifications globales
+        // Global checks
         if (!begun && !beginProblemReported) {
-            error(result, 0, "le programme doit commencer par 'Snk_Begin'.");
+            error(result, 0, "the program must start with 'Snk_Begin'.");
         }
         if (!ended) {
-            error(result, 0, "le programme doit se terminer par 'Snk_End'.");
+            error(result, 0, "the program must end with 'Snk_End'.");
         }
         if (blockDepth > 0) {
-            error(result, 0, blockDepth + " bloc(s) 'Begin' jamais fermé(s) par 'End'.");
+            error(result, 0, blockDepth + " 'Begin' block(s) never closed by 'End'.");
         }
 
-        result.append(errors == 0 ? "Aucune erreur syntaxique.\n" : errors + " erreur(s) syntaxique(s).\n");
+        result.append(errors == 0 ? "No syntax errors.\n" : errors + " syntax error(s).\n");
         return result.toString();
     }
 
     private void declaration(StringBuilder result, int n, String body, String line) {
         if (body.isEmpty()) {
-            error(result, n, "déclaration incorrecte (aucun identifiant) : " + line);
+            error(result, n, "invalid declaration (no identifier): " + line);
             return;
         }
         for (String variable : body.split(",", -1)) {
             variable = variable.trim();
             if (!IDENT_P.matcher(variable).matches()) {
-                error(result, n, "identifiant invalide : '" + variable + "'");
+                error(result, n, "invalid identifier: '" + variable + "'");
             } else if (RESERVED.contains(variable)) {
-                error(result, n, "'" + variable + "' est un mot réservé et ne peut pas être une variable.");
+                error(result, n, "'" + variable + "' is a reserved word and cannot be a variable name.");
             } else {
                 declaredVariables.add(variable);
-                result.append("Déclaration détectée : ").append(variable).append("\n");
+                result.append("Declaration detected: ").append(variable).append("\n");
             }
         }
     }
@@ -243,7 +243,7 @@ public class SyntaxicAnalyzer {
     /** Returns false (and reports an error) if the operand is an identifier that was not declared. */
     private boolean checkDeclared(StringBuilder result, int n, String operand) {
         if (IDENT_P.matcher(operand).matches() && !declaredVariables.contains(operand)) {
-            error(result, n, "la variable '" + operand + "' n'est pas déclarée.");
+            error(result, n, "variable '" + operand + "' is not declared.");
             return false;
         }
         return true;
@@ -251,6 +251,6 @@ public class SyntaxicAnalyzer {
 
     private void error(StringBuilder result, int n, String message) {
         errors++;
-        result.append(n > 0 ? "Erreur (ligne " + n + ") : " : "Erreur : ").append(message).append("\n");
+        result.append(n > 0 ? "Error (line " + n + "): " : "Error: ").append(message).append("\n");
     }
 }

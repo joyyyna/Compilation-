@@ -9,35 +9,35 @@ public class Lexer {
 
 	static {
 		// SNAKE keywords
-		EXPLANATIONS.put("Snk_Begin", "mot clé de début de programme");
-		EXPLANATIONS.put("Snk_End", "mot clé de fin de programme");
-		EXPLANATIONS.put("Snk_Int", "mot clé de déclaration du type entier");
-		EXPLANATIONS.put("Snk_Real", "mot clé de déclaration du type réel");
-		EXPLANATIONS.put("Snk_Strg", "mot clé de déclaration du type chaîne");
-		EXPLANATIONS.put("Set", "mot clé pour affectation d’une valeur");
-		EXPLANATIONS.put("Get", "mot clé de l'instruction Get");
-		EXPLANATIONS.put("from", "mot clé de l'instruction Get");
-		EXPLANATIONS.put("If", "mot clé pour conditionnel");
-		EXPLANATIONS.put("Else", "mot clé pour sinon");
-		EXPLANATIONS.put("Begin", "début de bloc");
-		EXPLANATIONS.put("End", "fin de bloc");
-		EXPLANATIONS.put("Snk_Print", "mot clé d'affichage");
+		EXPLANATIONS.put("Snk_Begin", "program start keyword");
+		EXPLANATIONS.put("Snk_End", "program end keyword");
+		EXPLANATIONS.put("Snk_Int", "integer type declaration keyword");
+		EXPLANATIONS.put("Snk_Real", "real type declaration keyword");
+		EXPLANATIONS.put("Snk_Strg", "string type declaration keyword");
+		EXPLANATIONS.put("Set", "assignment keyword");
+		EXPLANATIONS.put("Get", "Get instruction keyword");
+		EXPLANATIONS.put("from", "Get instruction keyword");
+		EXPLANATIONS.put("If", "conditional keyword");
+		EXPLANATIONS.put("Else", "else keyword");
+		EXPLANATIONS.put("Begin", "block start");
+		EXPLANATIONS.put("End", "block end");
+		EXPLANATIONS.put("Snk_Print", "print keyword");
 
 		// Symbols
-		EXPLANATIONS.put(",", "séparateur");
-		EXPLANATIONS.put("#", "fin d’instruction");
-		EXPLANATIONS.put("[", "début de condition");
-		EXPLANATIONS.put("]", "fin de condition");
+		EXPLANATIONS.put(",", "separator");
+		EXPLANATIONS.put("#", "end of instruction");
+		EXPLANATIONS.put("[", "condition start");
+		EXPLANATIONS.put("]", "condition end");
 
 		// Operators
-		EXPLANATIONS.put("<", "opérateur de comparaison");
-		EXPLANATIONS.put(">", "opérateur de comparaison");
-		EXPLANATIONS.put("=", "opérateur de comparaison");
-		EXPLANATIONS.put("!=", "opérateur de comparaison");
+		EXPLANATIONS.put("<", "comparison operator");
+		EXPLANATIONS.put(">", "comparison operator");
+		EXPLANATIONS.put("=", "comparison operator");
+		EXPLANATIONS.put("!=", "comparison operator");
 	}
 
 	// Order matters: comment line, string, real, integer, identifier, "!=", single symbols,
-	// and finally any other non-blank character (reported as "inconnu" instead of being skipped).
+	// and finally any other non-blank character (reported as "unknown" instead of being skipped).
 	private static final Pattern TOKEN = Pattern.compile(
 			"(?m)^[ \\t]*##[^\\r\\n]*"
 			+ "|\"[^\"\\r\\n]*\""
@@ -50,24 +50,24 @@ public class Lexer {
 
 	private String getTokenExplanation(String token) {
 		if (token.startsWith("##")) {
-			return "commentaire";
+			return "comment";
 		}
 		String known = EXPLANATIONS.get(token);
 		if (known != null) {
 			return known;
 		}
 		if (token.matches("\\d+")) {
-			return "nombre entier";
+			return "integer number";
 		} else if (token.matches("\\d+\\.\\d+")) {
-			return "nombre réel";
+			return "real number";
 		} else if (token.matches("\"[^\"]*\"")) {
-			return "chaîne de caractères";
+			return "string literal";
 		} else if (token.matches("[a-zA-Z][a-zA-Z0-9_]*")) {
-			return "identificateur";
+			return "identifier";
 		} else if (token.equals("\"")) {
-			return "chaîne non terminée";
+			return "unterminated string";
 		}
-		return "inconnu";
+		return "unknown";
 	}
 
 	public String tokenize(String input) {
