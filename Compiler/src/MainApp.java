@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
 
@@ -15,6 +16,7 @@ public class MainApp {
 		frame = new JFrame("SNAKE Compiler");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(800, 600);
+		frame.setLocationRelativeTo(null);
 
 		JButton loadFileButton = new JButton("Load File");
 		JButton lexicalAnalysisButton = new JButton("Lexical Analysis");
@@ -23,6 +25,7 @@ public class MainApp {
 
 		resultArea = new JTextArea();
 		resultArea.setEditable(false);
+		resultArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
 		JScrollPane scrollPane = new JScrollPane(resultArea);
 
 		JPanel buttonPanel = new JPanel();
@@ -46,6 +49,13 @@ public class MainApp {
 
 	private void loadFile() {
 		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setFileFilter(new FileNameExtensionFilter("SNAKE programs (*.snk, *.txt)", "snk", "txt"));
+
+		File examples = new File("../examples");
+		if (examples.isDirectory()) {
+			fileChooser.setCurrentDirectory(examples);
+		}
+
 		int returnValue = fileChooser.showOpenDialog(frame);
 
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -63,29 +73,26 @@ public class MainApp {
 		try {
 			String content = SnakeFileHandler.readFile(selectedFile);
 			Lexer lexer = new Lexer();
-			String result = lexer.tokenize(content);
-			resultArea.setText(result);
+			showResult(lexer.tokenize(content));
 		} catch (Exception e) {
-			showError("Error during lexical analysis: " + e.getMessage());
+			showError("Error during lexical analysis: " + describe(e));
 		}
 	}
 
 	private void performSyntaxAnalysis() {
-	    if (selectedFile == null) {
-	        showError("Please load a file first.");
-	        return;
-	    }
+		if (selectedFile == null) {
+			showError("Please load a file first.");
+			return;
+		}
 
-	    try {
-	        String content = SnakeFileHandler.readFile(selectedFile);
-	        SyntaxicAnalyzer analyzer = new SyntaxicAnalyzer(); // Remplacement de Parser par SyntaxicAnalyzer
-	        String result = analyzer.analyze(content);          // Remplacement de parse() par analyze()
-	        resultArea.setText(result);
-	    } catch (Exception e) {
-	        showError("Error during syntax analysis: " + e.getMessage());
-	    }
+		try {
+			String content = SnakeFileHandler.readFile(selectedFile);
+			SyntaxicAnalyzer analyzer = new SyntaxicAnalyzer();
+			showResult(analyzer.analyze(content));
+		} catch (Exception e) {
+			showError("Error during syntax analysis: " + describe(e));
+		}
 	}
-
 
 	private void performSemanticAnalysis() {
 		if (selectedFile == null) {
@@ -96,11 +103,20 @@ public class MainApp {
 		try {
 			String content = SnakeFileHandler.readFile(selectedFile);
 			SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
-			String result = semanticAnalyzer.analyze(content);
-			resultArea.setText(result);
+			showResult(semanticAnalyzer.analyze(content));
 		} catch (Exception e) {
-			showError("Error during semantic analysis: " + e.getMessage());
+			showError("Error during semantic analysis: " + describe(e));
 		}
+	}
+
+	private void showResult(String result) {
+		resultArea.setText(result);
+		resultArea.setCaretPosition(0); // scroll back to the top
+	}
+
+	/** getMessage() can be null (e.g. NullPointerException), so fall back to the exception type. */
+	private String describe(Exception e) {
+		return e.getMessage() != null ? e.getMessage() : e.toString();
 	}
 
 	private void showError(String message) {
