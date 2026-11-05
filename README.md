@@ -8,8 +8,6 @@ A small compiler front-end written in **Java** for **SNAKE**, a simple teaching 
 | **Syntax analysis** | `SyntaxicAnalyzer` | Checks each line against the language rules: instructions end with `#`, program starts with `Snk_Begin` and ends with `Snk_End`, `Begin`/`End` blocks are balanced, `Else` follows an `If`, conditions and `Snk_Print` arguments are well formed, variables are declared before use |
 | **Semantic analysis** | `SemanticAnalyzer` | Tracks declared variables and their types, and reports undeclared variables, redeclarations, reserved words used as names, and type mismatches (assignments and conditions) |
 
-University project (compilation course, USTO-MB, M1 AI & Applications).
-
 ## The SNAKE language
 
 ```
