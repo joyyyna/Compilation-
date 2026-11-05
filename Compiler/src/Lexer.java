@@ -3,6 +3,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class Lexer {
 
 	private static final Map<String, String> EXPLANATIONS = new HashMap<>();
@@ -81,6 +82,7 @@ public class Lexer {
 		return result.toString();
 	}
 
+	
 	public static void main(String[] args) {
 		Lexer lexer = new Lexer();
 
