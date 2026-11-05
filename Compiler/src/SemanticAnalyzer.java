@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class SemanticAnalyzer {
     private static final String IDENT = "[a-zA-Z][a-zA-Z0-9_]*";
     private static final String VALUE = "\"[^\"]*\"|\\d+\\.\\d+|\\d+|" + IDENT;
