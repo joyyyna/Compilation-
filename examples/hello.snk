@@ -1,12 +1,15 @@
+## A valid SNAKE program
 Snk_Begin
 Snk_Int i, j #
 Snk_Real x1 #
+Snk_Strg s #
 Set i 10 #
+Set s "Hello, World" #
 If [ i < 20 ]
 Set j 5 #
 Else
 Begin
 Set x1 15.5 #
 End
-Snk_Print "Hello" #
+Snk_Print s, "!" #
 Snk_End
