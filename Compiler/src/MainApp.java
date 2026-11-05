@@ -3,6 +3,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
 
+
 public class MainApp {
 	private JFrame frame;
 	private JTextArea resultArea;
