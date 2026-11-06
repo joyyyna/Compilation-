@@ -158,3 +158,8 @@ Error: Type mismatch in assignment. Expected int but got '2.5'. Line: Set i 2.5 
 ## Limitations
 
 This is a learning project. The analyzers work **line by line** and do not build a syntax tree, and the compiler does not generate code. `If` / `Else` / `Begin` / `End` pairing is only counted, not matched structurally.
+
+## Author
+
+- Riheb Talhi: Master's student in Artificial Intelligence and its Applications, USTO-MB.
+- Narimene Derkaoui: Master's student in Artificial Intelligence and its Applications, USTO-MB.
